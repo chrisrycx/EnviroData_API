@@ -8,6 +8,7 @@
     <title>Environmental Data Quality API</title>
     <meta name="description" content="Data quality API demonstration">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-2.4.0.min.js"></script>
 </head>
 
 <body>
@@ -15,8 +16,8 @@
 		<div id="logo"><img src="/logo.png">Data Bear Analytics</div>
 		<nav>  
 			<ul>
-				<li><a href="/">Docs</a>
-				<li><a href="/">Analytics</a>
+				<li><a href="/">API Docs</a>
+				<li><a href="/">Github</a>
 			</ul>
 		</nav>
 	</header>
@@ -37,20 +38,36 @@
 	</section>
     <section id="apiUI">
         <div>
-            <lable for="datainput">Check Data 2m Air Temperature</label>
+            <h2>API Input Data</h2>
             <textarea name="datainput">
-                Test,test
-                Test,test
-                Test,test
-                Test,test
+2021-09-28 08:00, 22.3
+2021-09-28 08:00, 23.5
+2021-09-28 08:00, 25.66
+2021-09-28 08:00, 22.02
+2021-09-28 08:00, 30
+2021-09-28 08:00, 19.55
+2021-09-28 08:00, 22.4
+2021-09-28 08:00, 22.6
+2021-09-28 08:00, 24.5
             </textarea>
             <button>Check Data</button>
         </div>
         <div>
-            <h2>Output</h2>
+            <h2>API Response</h2>
+            <textarea disabled>
+                {
+                    "datetime":[
+                        '2021-09-28'
+                    ],
+                    "datetime":
+                        [
+                        '2021-09-28'
+                        ]
+                }
+            </textarea>
         </div>
         <div>
-            <img src="dummychart.png">
+            <script src="enviroUI.js"></script>
         </div>
     </section>
 	<footer>

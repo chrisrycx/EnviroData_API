@@ -101,6 +101,15 @@ article h2 {
     display: flex;
 }
 
+#apiUI div {
+    flex: 1 200px;
+}
+
+textarea {
+    width: 200px;
+    height: 200px;
+}
+
 
 /* ------- Mobile ------- */
 @media screen and (max-width: 1000px) {
