@@ -7,7 +7,7 @@
     <link rel="canonical" href="https://html5-templates.com/" />
     <title>Environmental Data Quality API</title>
     <meta name="description" content="Data quality API demonstration">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="static/css/style.css">
     <script src="https://cdn.pydata.org/bokeh/release/bokeh-2.4.0.min.js"></script>
 </head>
 
@@ -40,15 +40,9 @@
         <div>
             <h2>API Input Data</h2>
             <textarea name="datainput">
-2021-09-28 08:00, 22.3
-2021-09-28 08:00, 23.5
-2021-09-28 08:00, 25.66
-2021-09-28 08:00, 22.02
-2021-09-28 08:00, 30
-2021-09-28 08:00, 19.55
-2021-09-28 08:00, 22.4
-2021-09-28 08:00, 22.6
-2021-09-28 08:00, 24.5
+            {%- for value in data %}
+{{ value[0] }},{{ value[1] }}
+            {%- endfor -%}
             </textarea>
             <button>Check Data</button>
         </div>
@@ -67,7 +61,7 @@
             </textarea>
         </div>
         <div>
-            <script src="enviroUI.js"></script>
+            <script src="static/js/enviroUI.js"></script>
         </div>
     </section>
 	<footer>
