@@ -9,13 +9,14 @@ from starlette.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
 from starlette.requests import Request
 from pydantic import BaseModel
+from bokeh.plotting import figure, ColumnDataSource
+from bokeh.models import Button, CustomJS
+from bokeh.embed import components
 import envirodataqc
 import pandas as pd
 
 
 class Temperatures(BaseModel):
-    auth_token: str
-    dataids: List[int]
     dtstamps: List[datetime]
     values: List[float]
 
@@ -41,7 +42,52 @@ app.mount('/static',StaticFiles(directory='static'),name='static')
 
 @app.get('/')
 def index(request: Request):
-    return templates.TemplateResponse('enviroUI.html',{'request':request,'data':testdata})
+    #Build Bokeh ColumnDataSource from default data
+    data = {'dt':[],'T':[]}
+    for row in testdata:
+        rowdt = datetime.strptime(row[0],'%Y-%m-%d %H:%M')
+        data['dt'].append(rowdt)
+        data['T'].append(row[1])
+    dsource = ColumnDataSource(data=data)
+
+    #Create a button
+    button = Button(label='Check Data')
+    button.js_on_click(CustomJS(code="""
+        //Test a API request
+        let testdata = {
+            dtstamps: ['2021-01-10 10:00','2021-01-10 10:15'],
+            values: [10.5,11.2]
+        }
+        fetch('/checkdata/2m_air_temperature',{
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(testdata)
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+    
+    """
+    "console.log('button: click!', this.toString())"))
+
+    #Generate initial Bokeh plot
+    Tplot = figure(
+            plot_width=500,
+            plot_height=350,
+            toolbar_location=None)
+    Tplot.line(source=dsource,x='dt',y='T')
+
+    script, divs = components([Tplot,button])
+
+    return templates.TemplateResponse(
+        'enviroUI.html',
+        {
+            'request':request,
+            'data':testdata,
+            'bokehscript':script,
+            'chart':divs[0],
+            'button':divs[1]
+        }
+    )
 
 
 @app.post("/checkdata/2m_air_temperature")
@@ -50,7 +96,6 @@ async def loadT(T:Temperatures):
     dts = pd.DatetimeIndex(T.dtstamps)
     data = pd.DataFrame(
         {
-            'data_id':T.dataids,
             'values':T.values
         },
         index=dts

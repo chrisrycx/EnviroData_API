@@ -9,6 +9,8 @@
     <meta name="description" content="Data quality API demonstration">
     <link rel="stylesheet" href="static/css/style.css">
     <script src="https://cdn.pydata.org/bokeh/release/bokeh-2.4.0.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.0.min.js"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -44,11 +46,11 @@
 {{ value[0] }},{{ value[1] }}
             {%- endfor -%}
             </textarea>
-            <button>Check Data</button>
+            {{ button|safe }}
         </div>
         <div>
             <h2>API Response</h2>
-            <textarea disabled>
+            <textarea id="response" disabled>
                 {
                     "datetime":[
                         '2021-09-28'
@@ -59,9 +61,10 @@
                         ]
                 }
             </textarea>
-        </div>
+        </div id="chart">
+            {{ chart|safe }}
         <div>
-            <script src="static/js/enviroUI.js"></script>
+            
         </div>
     </section>
 	<footer>
@@ -71,7 +74,8 @@
 			Contact: <a href="mailto:me@example.com">Mail me</a>
 		</address>
 	</footer>
-
+    {{ bokehscript|safe }}
+    <!-- <script src="static/js/enviroAPI.js"></script> -->
 
 </body>
 
