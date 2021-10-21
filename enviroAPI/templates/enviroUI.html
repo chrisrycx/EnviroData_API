@@ -39,32 +39,29 @@
 		</main>
 	</section>
     <section id="apiUI">
-        <div>
+        <div id="apiInputs">
             <h2>API Input Data</h2>
-            <textarea name="datainput">
-            {%- for value in data %}
-{{ value[0] }},{{ value[1] }}
-            {%- endfor -%}
-            </textarea>
+            {{ textarea|safe }}
             {{ button|safe }}
         </div>
-        <div>
-            <h2>API Response</h2>
-            <textarea id="response" disabled>
-                {
-                    "datetime":[
-                        '2021-09-28'
-                    ],
-                    "datetime":
-                        [
-                        '2021-09-28'
-                        ]
-                }
-            </textarea>
-        </div id="chart">
+        <div id="chart">
             {{ chart|safe }}
         <div>
-            
+    </section>
+    <section>
+        <div id="apiResponse">
+            <h2>API Response</h2>
+            <textarea id="response" disabled>
+                    {
+                        "datetime":[
+                            '2021-09-28'
+                        ],
+                        "datetime":
+                            [
+                            '2021-09-28'
+                            ]
+                    }
+            </textarea>
         </div>
     </section>
 	<footer>

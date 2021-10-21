@@ -10,8 +10,9 @@ from starlette.staticfiles import StaticFiles
 from starlette.requests import Request
 from pydantic import BaseModel
 from bokeh.plotting import figure, ColumnDataSource
-from bokeh.models import Button, CustomJS
+from bokeh.models import Button, TextAreaInput, CustomJS, CDSView, BooleanFilter
 from bokeh.embed import components
+from bokeh.transform import factor_mark
 import envirodataqc
 import pandas as pd
 
@@ -21,19 +22,19 @@ class Temperatures(BaseModel):
     values: List[float]
 
 testdata = [
-    ("2021-03-07 00:50",-3.9),
-    ("2021-03-07 01:00",-5.1),
-    ("2021-03-07 01:10",-5.9),
-    ("2021-03-07 01:20",-6.2),
-    ("2021-03-07 01:30",-5.1),
-    ("2021-03-07 01:40",-5.1),
-    ("2021-03-07 01:50",-5.9),
-    ("2021-03-07 02:00",-5.7),
-    ("2021-03-07 02:10",-6.2),
-    ("2021-03-07 02:20",-6,7),
-    ("2021-03-07 02:30",-5.8),
-    ("2021-03-07 02:40",-6.7),
-    ("2021-03-07 02:50",-6.3)
+    ("2021-03-07 00:50",3.9,0),
+    ("2021-03-07 01:00",5.1,0),
+    ("2021-03-07 01:10",5.9,1),
+    ("2021-03-07 01:20",6.2,1),
+    ("2021-03-07 01:30",5.1,1),
+    ("2021-03-07 01:40",5.1,0),
+    ("2021-03-07 01:50",5.9,0),
+    ("2021-03-07 02:00",-5.7,2),
+    ("2021-03-07 02:10",6.2,0),
+    ("2021-03-07 02:20",6,7,1),
+    ("2021-03-07 02:30",-5.8,0),
+    ("2021-03-07 02:40",6.7,2),
+    ("2021-03-07 02:50",-6.3,0)
 ]
 
 app = FastAPI()
@@ -43,16 +44,34 @@ app.mount('/static',StaticFiles(directory='static'),name='static')
 @app.get('/')
 def index(request: Request):
     #Build Bokeh ColumnDataSource from default data
-    data = {'dt':[],'T':[]}
+    #Also convert default data to string for loading
+    #to textarea
+    data = {'dt':[],'T':[],'quality':[]}
+    datastr = ''
     for row in testdata:
         rowdt = datetime.strptime(row[0],'%Y-%m-%d %H:%M')
         data['dt'].append(rowdt)
         data['T'].append(row[1])
-    dsource = ColumnDataSource(data=data)
+        data['quality'].append(row[2])
 
-    #Create a button
-    button = Button(label='Check Data')
-    button.js_on_click(CustomJS(code="""
+        rowstr = ','.join(str(x) for x in row) + '\n'
+        datastr = datastr + rowstr
+
+    dsource = ColumnDataSource(data=data)
+    filter_6 = [True if y_val >= 6 else False for y_val in dsource.data['T']]
+    dsource_view = CDSView(source=dsource, filters=[BooleanFilter(filter_6)])
+
+    #Test callback
+    testJS = CustomJS(args={'chartdata':dsource},code="""
+    //JS to update chart
+    const data = chartdata.data
+    console.log(data)
+    data['T'] = data['T'].map(x => x*x)
+    chartdata.change.emit()
+    """
+    )
+
+    testJS2 = CustomJS(code="""
         //Test a API request
         let testdata = {
             dtstamps: ['2021-01-10 10:00','2021-01-10 10:15'],
@@ -66,26 +85,46 @@ def index(request: Request):
         .then(response => response.json())
         .then(data => console.log(data))
     
-    """
-    "console.log('button: click!', this.toString())"))
+    """)
+
+    #Create the text area
+    textarea = TextAreaInput(value=datastr, rows=10)
+
+    #Create a button
+    button = Button(label='Check Data')
+    button.js_on_click(testJS)
 
     #Generate initial Bokeh plot
     Tplot = figure(
             plot_width=500,
             plot_height=350,
+            x_axis_type='datetime',
             toolbar_location=None)
+
+    #Add a line for the data
     Tplot.line(source=dsource,x='dt',y='T')
 
-    script, divs = components([Tplot,button])
+    #Add scatter plot for quality markers
+    '''
+    Tplot.scatter(
+        source=dsource,
+        x='dt',
+        y='T',
+        marker=factor_mark('quality',markers=['circle'])
+    )
+    '''
+    Tplot.circle(source=dsource, view=dsource_view, x='dt',y='T',color='red')
+
+    script, divs = components([Tplot,textarea,button])
 
     return templates.TemplateResponse(
         'enviroUI.html',
         {
             'request':request,
-            'data':testdata,
             'bokehscript':script,
             'chart':divs[0],
-            'button':divs[1]
+            'textarea':divs[1],
+            'button':divs[2]
         }
     )
 
