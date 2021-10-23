@@ -24,17 +24,17 @@ class Temperatures(BaseModel):
 testdata = [
     ("2021-03-07 00:50",3.9,0),
     ("2021-03-07 01:00",5.1,0),
-    ("2021-03-07 01:10",5.9,1),
-    ("2021-03-07 01:20",6.2,1),
+    ("2021-03-07 01:10",5.9,0),
+    ("2021-03-07 01:20",6.2,0),
     ("2021-03-07 01:30",5.1,1),
-    ("2021-03-07 01:40",5.1,0),
+    ("2021-03-07 01:40",5.1,1),
     ("2021-03-07 01:50",5.9,0),
     ("2021-03-07 02:00",-5.7,2),
     ("2021-03-07 02:10",6.2,0),
-    ("2021-03-07 02:20",6,7,1),
-    ("2021-03-07 02:30",-5.8,0),
-    ("2021-03-07 02:40",6.7,2),
-    ("2021-03-07 02:50",-6.3,0)
+    ("2021-03-07 02:20",6.7,0),
+    ("2021-03-07 02:30",-5.8,2),
+    ("2021-03-07 02:40",6.7,0),
+    ("2021-03-07 02:50",-6.3,2)
 ]
 
 app = FastAPI()
@@ -54,12 +54,17 @@ def index(request: Request):
         data['T'].append(row[1])
         data['quality'].append(row[2])
 
-        rowstr = ','.join(str(x) for x in row) + '\n'
+        rowstr = ','.join([row[0],str(row[1])]) + '\n'
         datastr = datastr + rowstr
 
     dsource = ColumnDataSource(data=data)
-    filter_6 = [True if y_val >= 6 else False for y_val in dsource.data['T']]
-    dsource_view = CDSView(source=dsource, filters=[BooleanFilter(filter_6)])
+    filter_mod = [True if y_val == 1 else False for y_val in dsource.data['quality']]
+    filter_bad = [True if y_val == 2 else False for y_val in dsource.data['quality']]
+    mod_view = CDSView(source=dsource, filters=[BooleanFilter(filter_mod)])
+    bad_view = CDSView(source=dsource, filters=[BooleanFilter(filter_bad)])
+
+    #Create the text area
+    textarea = TextAreaInput(value=datastr, rows=10)
 
     #Test callback
     testJS = CustomJS(args={'chartdata':dsource},code="""
@@ -87,12 +92,17 @@ def index(request: Request):
     
     """)
 
-    #Create the text area
-    textarea = TextAreaInput(value=datastr, rows=10)
+    testJS3 = CustomJS(args={'textarea':textarea},code="""
+    //Test parsing data from input
+    console.log(textarea.value)
+
+    """)
+
+    
 
     #Create a button
     button = Button(label='Check Data')
-    button.js_on_click(testJS)
+    button.js_on_click(testJS3)
 
     #Generate initial Bokeh plot
     Tplot = figure(
@@ -113,7 +123,25 @@ def index(request: Request):
         marker=factor_mark('quality',markers=['circle'])
     )
     '''
-    Tplot.circle(source=dsource, view=dsource_view, x='dt',y='T',color='red')
+    Tplot.circle(
+        source=dsource,
+        view=mod_view,
+        x='dt',
+        y='T',
+        color='yellow',
+        size=8,
+        legend_label='Suspicious'
+        )
+    Tplot.circle_x(
+        source=dsource,
+        view=bad_view,
+        x='dt',
+        y='T',
+        color='red',
+        line_color='black',
+        size=8,
+        legend_label='Bad'
+        )
 
     script, divs = components([Tplot,textarea,button])
 
