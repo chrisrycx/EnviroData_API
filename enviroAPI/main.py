@@ -57,6 +57,9 @@ def index(request: Request):
         rowstr = ','.join([row[0],str(row[1])]) + '\n'
         datastr = datastr + rowstr
 
+    #Delete last \n character
+    datastr = datastr[:-1]
+
     dsource = ColumnDataSource(data=data)
     filter_mod = [True if y_val == 1 else False for y_val in dsource.data['quality']]
     filter_bad = [True if y_val == 2 else False for y_val in dsource.data['quality']]
@@ -66,8 +69,40 @@ def index(request: Request):
     #Create the text area
     textarea = TextAreaInput(value=datastr, rows=10)
 
-    #Test callback
-    testJS = CustomJS(args={'chartdata':dsource},code="""
+    #Load data callback
+    loaddataJS = CustomJS(args={'textarea':textarea},code="""
+    //Test parsing data from input
+    let txtinput = textarea.value;
+
+    //Split by row
+    let rows = txtinput.split(/\\r?\\n/);
+
+    //Extract data by row
+    let dts = []
+    let vals = []
+    for(let row of rows){
+        let data = row.split(',')
+        dts.push(data[0])
+        vals.push(data[1])
+    }
+    let dataset = {
+        dtstamps: dts,
+        values: vals
+    }
+    console.log(dataset)
+
+    fetch('/checkdata/2m_air_temperature',{
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(dataset)
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+
+    """)
+
+    #Display API response callback
+    APIresponseJS = CustomJS(args={'chartdata':dsource},code="""
     //JS to update chart
     const data = chartdata.data
     console.log(data)
@@ -92,17 +127,9 @@ def index(request: Request):
     
     """)
 
-    testJS3 = CustomJS(args={'textarea':textarea},code="""
-    //Test parsing data from input
-    console.log(textarea.value)
-
-    """)
-
-    
-
-    #Create a button
+    #Create a button and link to a callback
     button = Button(label='Check Data')
-    button.js_on_click(testJS3)
+    button.js_on_click(loaddataJS)
 
     #Generate initial Bokeh plot
     Tplot = figure(
@@ -114,15 +141,7 @@ def index(request: Request):
     #Add a line for the data
     Tplot.line(source=dsource,x='dt',y='T')
 
-    #Add scatter plot for quality markers
-    '''
-    Tplot.scatter(
-        source=dsource,
-        x='dt',
-        y='T',
-        marker=factor_mark('quality',markers=['circle'])
-    )
-    '''
+    #Add circles to mark suspicious data points
     Tplot.circle(
         source=dsource,
         view=mod_view,
@@ -132,6 +151,8 @@ def index(request: Request):
         size=8,
         legend_label='Suspicious'
         )
+
+    #Add x to mark bad data points
     Tplot.circle_x(
         source=dsource,
         view=bad_view,
