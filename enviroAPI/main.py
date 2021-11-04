@@ -21,20 +21,25 @@ class Temperatures(BaseModel):
     dtstamps: List[datetime]
     values: List[float]
 
+class TQuality(BaseModel):
+    dtstamps: List[datetime] = []
+    values: List[float] = []
+    quality: List[int] = []
+
 testdata = [
     ("2021-03-07 00:50",3.9,0),
     ("2021-03-07 01:00",5.1,0),
     ("2021-03-07 01:10",5.9,0),
-    ("2021-03-07 01:20",6.2,0),
-    ("2021-03-07 01:30",5.1,1),
-    ("2021-03-07 01:40",5.1,1),
-    ("2021-03-07 01:50",5.9,0),
-    ("2021-03-07 02:00",-5.7,2),
-    ("2021-03-07 02:10",6.2,0),
+    ("2021-03-07 01:20",5.1,0),
+    ("2021-03-07 01:30",5.1,2),
+    ("2021-03-07 01:40",5.1,0),
+    ("2021-03-07 01:50",5.1,0),
+    ("2021-03-07 02:00",5.7,0),
+    ("2021-03-07 02:10",-16.2,1),
     ("2021-03-07 02:20",6.7,0),
-    ("2021-03-07 02:30",-5.8,2),
-    ("2021-03-07 02:40",6.7,0),
-    ("2021-03-07 02:50",-6.3,2)
+    ("2021-03-07 02:30",-5.8,0),
+    ("2021-03-07 02:40",6.7,2),
+    ("2021-03-07 02:50",26.3,0)
 ]
 
 app = FastAPI()
@@ -70,7 +75,7 @@ def index(request: Request):
     textarea = TextAreaInput(value=datastr, rows=10)
 
     #Load data callback
-    loaddataJS = CustomJS(args={'textarea':textarea},code="""
+    loaddataJS = CustomJS(args={'textarea':textarea,'chartdata':dsource},code="""
     //Test parsing data from input
     let txtinput = textarea.value;
 
@@ -89,7 +94,6 @@ def index(request: Request):
         dtstamps: dts,
         values: vals
     }
-    console.log(dataset)
 
     fetch('/checkdata/2m_air_temperature',{
             method: 'POST',
@@ -97,35 +101,18 @@ def index(request: Request):
             body: JSON.stringify(dataset)
         })
         .then(response => response.json())
-        .then(data => console.log(data))
-
-    """)
-
-    #Display API response callback
-    APIresponseJS = CustomJS(args={'chartdata':dsource},code="""
-    //JS to update chart
-    const data = chartdata.data
-    console.log(data)
-    data['T'] = data['T'].map(x => x*x)
-    chartdata.change.emit()
-    """
-    )
-
-    testJS2 = CustomJS(code="""
-        //Test a API request
-        let testdata = {
-            dtstamps: ['2021-01-10 10:00','2021-01-10 10:15'],
-            values: [10.5,11.2]
-        }
-        fetch('/checkdata/2m_air_temperature',{
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(testdata)
+        .then(data => {
+            //JS to update chart
+            console.log('In final function')
+            console.log(data)
+            console.log(chartdata)
+            chartdata.data['T'] = [5,5,5,5,5,5,5,5,5,5,5,5,5]
+            chartdata.data['quality'] = [2,1,2,1,2,1,2,1,2,1,2,1,2]
+            chartdata.change.emit()
         })
-        .then(response => response.json())
-        .then(data => console.log(data))
-    
+
     """)
+
 
     #Create a button and link to a callback
     button = Button(label='Check Data')
@@ -178,7 +165,7 @@ def index(request: Request):
     )
 
 
-@app.post("/checkdata/2m_air_temperature")
+@app.post("/checkdata/2m_air_temperature", response_model=TQuality)
 async def loadT(T:Temperatures):
     #Load data into a pandas DF
     dts = pd.DatetimeIndex(T.dtstamps)
@@ -191,9 +178,17 @@ async def loadT(T:Temperatures):
 
     #Check data
     data_flagged = envirodataqc.check_vals(data['values'],'air_temperature')
-    print(data_flagged.head())
+    
 
-    #Convert to dictionary
-    data_flagged_json = data_flagged.to_json()
+    #Calculate the maximum flag
+    data_flagged['max_flag'] = data_flagged[['flags_range','flags_rate','flags_flat']].max(1)
 
-    return data_flagged_json
+    print(data_flagged.head(20))
+
+    #Convert to output
+    response = TQuality()
+    response.dtstamps = T.dtstamps
+    response.values = T.values
+    response.quality = data_flagged['max_flag'].to_list()
+
+    return response
