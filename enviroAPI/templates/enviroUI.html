@@ -8,10 +8,7 @@
     <title>Environmental Data Quality API</title>
     <meta name="description" content="Data quality API demonstration">
     <link rel="stylesheet" href="static/css/style.css">
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.0.min.js"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.0.min.js"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
 </head>
 
 <body>
@@ -59,9 +56,6 @@
             <input type="submit" value="Check Data">
             </form>
         </div>
-        <div id="chart"><div>
-    </section>
-    <section>
         <div id="apiResponse">
             <h2>API Response</h2>
             <textarea id="response" disabled>
@@ -76,6 +70,10 @@
                     }
             </textarea>
         </div>
+    </section>
+    <section>
+        <div id="chart"><div>
+        <div id="tester" style="width:700px;height:400px;"></div>
     </section>
 	<footer>
 		<p>&copy; DataBear Analytics</p>
