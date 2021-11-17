@@ -9,13 +9,8 @@ from starlette.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
 from starlette.requests import Request
 from pydantic import BaseModel
-from bokeh.plotting import figure, ColumnDataSource
-from bokeh.models import Button, TextAreaInput, CustomJS, CDSView, BooleanFilter
-from bokeh.embed import components
-from bokeh.transform import factor_mark
 import envirodataqc
 import pandas as pd
-
 
 class Temperatures(BaseModel):
     dtstamps: List[datetime]
@@ -54,7 +49,6 @@ async def loadT(T:Temperatures):
     #Check data
     data_flagged = envirodataqc.check_vals(data['values'],'air_temperature')
     
-
     #Calculate the maximum flag
     data_flagged['max_flag'] = data_flagged[['flags_range','flags_rate','flags_flat']].max(1)
 

@@ -1,46 +1,64 @@
-//Test plotly
+//JS for API Demo page
 
-//Event handler
-var inputform = document.getElementById('datainput')
-inputform.onsubmit = test
+//DOM elements
+const chart = document.getElementById('chart');
+const inputform = document.getElementById('datainput')
+const inputvals = document.getElementById('inputvals')
+inputform.onsubmit = sendData
 
-TESTER = document.getElementById('tester');
-
-var dts = [
-    '2021-03-07 00:50',
-    '2021-03-07 01:00',
-    '2021-03-07 01:10',
-    '2021-03-07 01:20',
-    '2021-03-07 01:30',
-    '2021-03-07 01:40',
-    '2021-03-07 01:50',
-    '2021-03-07 02:00',
-    '2021-03-07 02:10',
-    '2021-03-07 02:20',
-    '2021-03-07 02:30',
-    '2021-03-07 02:40',
-    '2021-03-07 02:50'
-]
-
-var y = [3.9,5.1,5.9,5.1,5.1,5.1,5.1,5.7,-16.2,6.7,5.8,-6.7,26.5]
-
-var quality = [0,0,0,1,1,1,1,0,2,0,0,1,2]
-
-Plotly.newPlot( TESTER, [{
-    x: dts,
-    y: y }], {
-    margin: { t: 0 } } 
-);
+//Initial plot using default data in input
+let initialtxt = inputvals.value
+let initialdata = parseInput(initialtxt)
+initialdata['quality'] = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+updateChart(initialdata)
 
 //Functions
-function test(event){
+function parseInput(inputtxt){
+    //Parse CSV data from input to an object
+
+    //Split by row
+    let rows = inputtxt.split(/\r?\n/)
+
+    //Extract data by row
+    let dts = []
+    let vals = []
+    for(let row of rows){
+        let data = row.split(',')
+        dts.push(data[0])
+        vals.push(data[1])
+    }
+    let dataset = {
+        dtstamps: dts,
+        values: vals
+    }
+
+    return dataset
+}
+
+function sendData(event){
+    //Send input data to backend
     event.preventDefault()
-    console.log("in test function")
+    let dataset = parseInput(this[0].value)
+    
+    //Post request
+    fetch('/checkdata/2m_air_temperature',{
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(dataset)
+    })
+    .then(response => response.json())
+    .then(data => {
+        //JS to update chart
+        updateChart(data)
+    })
+}
+
+function updateChart(data){
 
     //Create line for all data
     let dataline = {
-        x: dts,
-        y: y,
+        x: data.dtstamps,
+        y: data.values,
         mode: 'lines',
         showlegend: false
     }
@@ -50,13 +68,13 @@ function test(event){
     dts_bad = []
     y_susp = []
     y_bad = []
-    for(let i = 0; i < quality.length; i++){
-        if(quality[i] == 1){
-            dts_susp.push(dts[i])
-            y_susp.push(y[i])
-        }else if(quality[i] == 2){
-            dts_bad.push(dts[i])
-            y_bad.push(y[i])
+    for(let i = 0; i < data.quality.length; i++){
+        if(data.quality[i] == 1){
+            dts_susp.push(data.dtstamps[i])
+            y_susp.push(data.values[i])
+        }else if(data.quality[i] == 2){
+            dts_bad.push(data.dtstamps[i])
+            y_bad.push(data.values[i])
         }
     }
 
@@ -83,9 +101,7 @@ function test(event){
         }
     }
 
-
-    Plotly.newPlot(TESTER,[dataline,points_susp,points_bad]);
-    
+    Plotly.newPlot(chart,[dataline,points_susp,points_bad]);
 }
 
 
