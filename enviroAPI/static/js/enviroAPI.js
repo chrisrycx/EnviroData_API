@@ -2,6 +2,7 @@
 
 //DOM elements
 const chart = document.getElementById('chart');
+const responsetxt = document.getElementById('responsetxt')
 const inputform = document.getElementById('datainput')
 const inputvals = document.getElementById('inputvals')
 inputform.onsubmit = sendData
@@ -48,9 +49,12 @@ function sendData(event){
     })
     .then(response => response.json())
     .then(data => {
-        //JS to update chart
-        updateChart(data)
-    })
+            //Load response to response div
+            responsetxt.textContent = JSON.stringify(data, undefined, 2)
+
+            //JS to update chart
+            updateChart(data)
+        })
 }
 
 function updateChart(data){
