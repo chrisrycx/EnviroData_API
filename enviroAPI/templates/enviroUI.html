@@ -22,37 +22,31 @@
 		</nav>
 	</header>
 	<section>
-		<strong>Environmental Data Quality API Demonstation</strong>
-	</section>
-	<section id="pageContent">
-		<main role="main">
-			<article>
-				<h2>Assess 2m Air Temperature</h2>
-				<p>
-                    Details on how it works????<br>
-                    Leteros, eu mucius fabellas. Stet facilis ius te, quando voluptatibus 
-                    eos in. Ad vix mundi alterum, integre urbanitas intellegam vix in.
-                </p>
-			</article>
-		</main>
+		<h2>Environmental Data Quality API - Demonstration</h2>
+        <p>
+            This page provides a simple demonstration of an environmental 
+            data quality API. Data (in this case 2 meter air tempertures) are 
+            submitted to the API as pairs of dates and values. The values are 
+            assessed and a data quality rating between 0 and 2 is returned.
+        <p>
+        <p>Quality Ratings:</p>
+        <ul>
+            <li>0 - Good</li>
+            <li>1 - Suspicious</li>
+            <li>2 - Bad</li>
+        </ul> 
 	</section>
     <section id="apiUI">
+        <h2>Assess 2m Air Temperature</h2>
+        <p>
+            Click "check data" to assess the air temperature data in the input. 
+            The default input data can be changed if desired but must follow the same 
+            format and be limited to X number of rows. Results are plotted below.
+        </p>
         <div id="apiInputs">
             <h2>API Input Data</h2>
             <form id="datainput">
-            <textarea id="inputvals" name="data">2021-03-07 00:50,3.9
-2021-03-07 01:00,5.1
-2021-03-07 01:10,5.9
-2021-03-07 01:20,5.1
-2021-03-07 01:30,5.1
-2021-03-07 01:40,5.1
-2021-03-07 01:50,5.1
-2021-03-07 02:00,5.7
-2021-03-07 02:10,-16.2
-2021-03-07 02:20,6.7
-2021-03-07 02:30,-5.8
-2021-03-07 02:40,6.7
-2021-03-07 02:50,26.5</textarea>
+            <textarea id="inputvals" name="data">{{ defaultdata }}</textarea>
             <input type="submit" value="Check Data">
             </form>
         </div>

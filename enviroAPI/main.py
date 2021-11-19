@@ -28,10 +28,27 @@ app.mount('/static',StaticFiles(directory='static'),name='static')
 
 @app.get('/')
 def index(request: Request):
+
+    defaultdata = '''
+2021-03-07 00:50,3.9
+2021-03-07 01:00,5.1
+2021-03-07 01:10,5.9
+2021-03-07 01:20,5.1
+2021-03-07 01:30,5.1
+2021-03-07 01:40,5.1
+2021-03-07 01:50,5.1
+2021-03-07 02:00,5.7
+2021-03-07 02:10,-16.2
+2021-03-07 02:20,6.7
+2021-03-07 02:30,-5.8
+2021-03-07 02:40,6.7
+2021-03-07 02:50,26.5'''
+
     return templates.TemplateResponse(
         'enviroUI.html',
         {
-            'request':request
+            'request':request,
+            'defaultdata':defaultdata
         }
     )
 
