@@ -98,25 +98,24 @@ article h2 {
     margin-bottom: 12px;
 }
 
-/*
-#apiUI {
+.input_response {
     display: flex;
 }
 
-#apiUI div {
-    flex: 1 200px;
+.input_response div {
+    flex: 1;
+    max-width: 300px;
 }
-*/
 
-textarea {
-    width: 200px;
-    height: 200px;
+#inputvals {
+    width: 250px;
+    height: 250px;
 }
 
 .apiResponse {
-    height: 500px;
-    width: 500px;
+    height: 300px;
     border: 2px solid black;
+    overflow-y: scroll;
 }
 
 /* ------- Mobile ------- */

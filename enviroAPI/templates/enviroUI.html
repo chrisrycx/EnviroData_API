@@ -25,7 +25,7 @@
 		<h2>Environmental Data Quality API - Demonstration</h2>
         <p>
             This page provides a simple demonstration of an environmental 
-            data quality API. Data (in this case 2 meter air tempertures) are 
+            data quality API. Data (in this case 2 meter air temperatures) are 
             submitted to the API as pairs of dates and values. The values are 
             assessed and a data quality rating between 0 and 2 is returned.
         <p>
@@ -37,25 +37,29 @@
         </ul> 
 	</section>
     <section id="apiUI">
-        <h2>Assess 2m Air Temperature</h2>
+        <h2>Check Air Temperature</h2>
         <p>
             Click "check data" to assess the air temperature data in the input. 
             The default input data can be changed if desired but must follow the same 
             format and be limited to X number of rows. Results are plotted below.
         </p>
-        <div id="apiInputs">
-            <h2>API Input Data</h2>
-            <form id="datainput">
-            <textarea id="inputvals" name="data">{{ defaultdata }}</textarea>
-            <input type="submit" value="Check Data">
-            </form>
+        <div class="input_response">
+            <div id="input_div">
+                <h2>API Input Data</h2>
+                <form id="datainput">
+                <textarea id="inputvals" name="data">{{ defaultdata }}</textarea>
+                <input type="submit" value="Check Data">
+                </form>
+            </div>
+            <div id="response_div">
+                <h2>API Response</h2>
+                <pre class="apiResponse"><code id="responsetxt"></code></pre>
+            </div>
         </div>
-        <div>
-            <h2>API Response</h2>
-            <pre class="apiResponse"><code id="responsetxt"></code></pre>
-        </div>
+        
     </section>
     <section>
+        <h2>Data Plot</h2>
         <div id="chart"><div>
     </section>
 	<footer>

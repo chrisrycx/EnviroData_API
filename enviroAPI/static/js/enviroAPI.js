@@ -59,6 +59,14 @@ function sendData(event){
 
 function updateChart(data){
 
+    //Create the basic layout
+    let layout = {
+        height: 550,
+        yaxis: {
+            title: "Temperature"
+        }
+    }
+    
     //Create line for all data
     let dataline = {
         x: data.dtstamps,
@@ -105,7 +113,7 @@ function updateChart(data){
         }
     }
 
-    Plotly.newPlot(chart,[dataline,points_susp,points_bad]);
+    Plotly.newPlot(chart,[dataline,points_susp,points_bad],layout);
 }
 
 
