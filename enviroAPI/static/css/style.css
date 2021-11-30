@@ -118,6 +118,10 @@ article h2 {
     overflow-y: scroll;
 }
 
+#chart {
+    border: 1pt solid black;
+}
+
 /* ------- Mobile ------- */
 @media screen and (max-width: 1000px) {
 	body > section {

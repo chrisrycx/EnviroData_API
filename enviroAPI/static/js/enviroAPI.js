@@ -64,6 +64,14 @@ function updateChart(data){
         height: 550,
         yaxis: {
             title: "Temperature"
+        },
+        legend: {
+            x: 0,
+            y: 1,
+            xanchor: 'left'
+        },
+        margin: {
+            t: 10
         }
     }
     
@@ -98,7 +106,7 @@ function updateChart(data){
         name: 'Suspicious',
         marker: {
             color: 'yellow',
-            size: '5'
+            size: '8'
         }
     }
 
@@ -109,7 +117,7 @@ function updateChart(data){
         name: 'Bad',
         marker: {
             color: 'red',
-            size: '5'
+            size: '8'
         }
     }
 
