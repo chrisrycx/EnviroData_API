@@ -20,6 +20,13 @@ function parseInput(inputtxt){
     //Split by row
     let rows = inputtxt.split(/\r?\n/)
 
+    //Truncate rows to limit amount of data that can be set
+    let maxrows = 200
+    let numrows = rows.length
+    if(numrows > maxrows){
+        rows = rows.slice(0,maxrows)
+    }
+
     //Extract data by row
     let dts = []
     let vals = []

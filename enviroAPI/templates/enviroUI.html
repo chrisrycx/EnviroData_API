@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="canonical" href="https://html5-templates.com/" />
+    <link rel="icon" type="image/png" href="static/img/logo_sm.png" />
     <title>Environmental Data Quality API</title>
     <meta name="description" content="Data quality API demonstration">
     <link rel="stylesheet" href="static/css/style.css">
@@ -13,19 +13,23 @@
 
 <body>
 	<header>
-		<div id="logo"><img src="/logo.png">Data Bear Analytics</div>
+		<div id="logo">
+            <a href="https://crceanalytics.com"><img src="/static/img/LogoBlack.png">CRC Earth Analytics</a>
+        </div>
 		<nav>  
 			<ul>
-				<li><a href="/">API Docs</a>
-				<li><a href="/">Github</a>
+				<li><a href="/docs">API Docs</a>
+				<li><a href="https://github.com/chrisrycx">Github</a>
 			</ul>
 		</nav>
 	</header>
 	<section>
-		<h2>Environmental Data Quality API - Demonstration</h2>
+		<h2>Environmental Data Quality Control - API Demonstration</h2>
         <p>
-            This page provides a simple demonstration of an environmental 
-            data quality API. Data (in this case 2 meter air temperatures) are 
+            This page provides a simple demonstration of an 
+            <a href="https://github.com/chrisrycx">
+                automated environmental data quality control API
+            </a>. Data (in this case 2 meter air temperatures) are 
             submitted to the API as pairs of dates and values. The values are 
             assessed and a data quality rating between 0 and 2 is returned.
         <p>
@@ -35,13 +39,18 @@
             <li>1 - Suspicious</li>
             <li>2 - Bad</li>
         </ul> 
+        <p>
+            The API uses the 
+            <a href="https://github.com/chrisrycx/EnviroDataQC">EnviroDataQC</a> 
+            Python library.
+        </p>
 	</section>
     <section id="apiUI">
         <h2>Check Air Temperature</h2>
         <p>
-            Click "check data" to assess the air temperature data in the input. 
-            The default input data can be changed if desired but must follow the same 
-            format and be limited to X number of rows. Results are plotted below.
+            Click "check data" to assess the air temperature data in the input box. 
+            The default input data can be changed if desired, but input must follow the same 
+            CSV format and be limited to 200 rows. Results are plotted below.
         </p>
         <div class="input_response">
             <div id="input_div">
@@ -57,13 +66,15 @@
             </div>
         </div>
         
+        
     </section>
     <section>
-        <h2>Data Plot</h2>
+        <h2>API Data Plot</h2>
+        <p>Input data as well as quality flags returned by the API are plotted below.</p>
         <div id="chart"><div>
     </section>
 	<footer>
-		<p>&copy; DataBear Analytics</p>
+		<p><a href="https://crceanalytics.com">&copy; CRC Earth Analytics</a></p>
         Template:<a href="https://html5-templates.com/" target="_blank" rel="nofollow">HTML5 Templates</a>
         <address>
 			Contact: <a href="mailto:me@example.com">Mail me</a>

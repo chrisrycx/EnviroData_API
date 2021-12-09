@@ -8,13 +8,13 @@ from fastapi import FastAPI
 from starlette.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
 from starlette.requests import Request
-from pydantic import BaseModel
+from pydantic import BaseModel, conlist
 import envirodataqc
 import pandas as pd
 
 class Temperatures(BaseModel):
-    dtstamps: List[datetime]
-    values: List[float]
+    dtstamps: conlist(datetime,max_items=200)
+    values: conlist(float,max_items=200)
 
 class TQuality(BaseModel):
     dtstamps: List[datetime] = []
